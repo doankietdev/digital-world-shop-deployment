@@ -8,7 +8,7 @@ services:
       - mern-app
     command: ['redis-server', '--requirepass', '${PASSWORD}']
   server:
-    image: digital-world-shop-api:1.0.0
+    image: doankietdev/digital-world-shop-api:1.0.0
     env_file:
       - .env.server
     environment:

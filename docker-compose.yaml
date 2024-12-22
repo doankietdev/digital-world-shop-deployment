@@ -1,0 +1,48 @@
+services:
+  redis:
+    image: redis:7.4.1
+    container_name: redis
+    restart: always
+    env_file: .env.redis
+    networks:
+      - mern-app
+    command: ['redis-server', '--requirepass', '${PASSWORD}']
+  server:
+    image: doankietdev/digital-world-shop-api:1.0.0
+    env_file:
+      - .env.server
+    environment:
+      - NODE_ENV=prod
+    depends_on:
+      - redis
+    networks:
+      - mern-app
+  reverse-proxy:
+    container_name: reverse-proxy
+    image: nginx:alpine
+    ports:
+      - '${HOST_PORT}:80'
+    volumes:
+      - ./nginx.reverse.conf:/etc/nginx/nginx.conf
+    restart: 'unless-stopped'
+    depends_on:
+      - server
+    networks:
+      - mern-app
+
+  client:
+    image: doankietdev/digital-world-shop-web:1.0.0
+    env_file: .env.client
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx.forward.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - reverse-proxy
+      - server
+    networks:
+      - mern-app
+
+networks:
+  mern-app:
+    driver: bridge

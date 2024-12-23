@@ -43,7 +43,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Starting Docker Compose services..."
-docker-compose up -d
+docker compose up -d
 
 if [ $? -ne 0 ]; then
     echo "Error starting Docker Compose services."

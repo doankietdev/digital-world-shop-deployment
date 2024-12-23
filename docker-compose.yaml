@@ -57,9 +57,7 @@ services:
     networks:
       - mern-app
     depends_on:
-      - certbot
-      - redis
-      - server
+      - cleanup
 networks:
   mern-app:
     driver: bridge

@@ -1,12 +1,17 @@
 #!/bin/bash
 
-# Check if the script is run with root privileges
+cleanup() {
+  echo "Cleaning up..."
+  docker rm -f tmp-proxy > /dev/null 2>&1
+}
+
+trap cleanup EXIT
+
 if [ "$(id -u)" -ne 0 ]; then
     echo "This script needs to be run with root privileges."
     exit 1
 fi
 
-# Run tmp-proxy (nginx) to serve SSL certificates
 echo "Starting tmp-proxy..."
 docker run -d \
   --name tmp-proxy \
@@ -15,40 +20,26 @@ docker run -d \
   -v $(pwd)/certbot/www:/var/www/certbot \
   nginx:latest
 
-# Check if tmp-proxy started successfully
 if [ $? -ne 0 ]; then
     echo "Failed to start tmp-proxy."
     exit 1
 fi
 
-# Run certbot to generate the SSL certificate
 echo "Running certbot to generate SSL certificate..."
-docker run -it --rm --name certbot \
+docker run -it --rm \
+  --name certbot \
   -v $(pwd)/certbot/conf:/etc/letsencrypt \
   -v $(pwd)/certbot/www:/var/www/certbot \
-  certbot/certbot certonly --webroot -w /var/www/certbot --force-renewal --email doankietdev@gmail.com -d digitals.software --agree-tos
+  certbot/certbot certonly --webroot -w /var/www/certbot --force-renewal --email doankietdev@gmail.com -d 178.128.209.229 --agree-tos
 
-# Check if certbot completed successfully
 if [ $? -ne 0 ]; then
     echo "Error running certbot."
     exit 1
 fi
 
-# Remove tmp-proxy after certbot completes
-echo "Removing tmp-proxy..."
-docker rm -f tmp-proxy
-
-# Check if tmp-proxy was removed successfully
-if [ $? -ne 0 ]; then
-    echo "Failed to remove tmp-proxy."
-    exit 1
-fi
-
-# Start docker-compose services
 echo "Starting Docker Compose services..."
 docker-compose up -d
 
-# Check if Docker Compose services started successfully
 if [ $? -ne 0 ]; then
     echo "Error starting Docker Compose services."
     exit 1

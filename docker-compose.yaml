@@ -32,6 +32,18 @@ services:
     command: certonly --webroot -w /var/www/certbot --force-renewal --email doankietdev@gmail.com -d digitals.software --agree-tos
     depends_on:
       - tmp-proxy
+
+  cleanup:
+    image: busybox
+    container_name: cleanup
+    command: >
+      /bin/sh -c "sleep 60 && docker-compose rm -f tmp-proxy"
+    depends_on:
+      - certbot
+    networks:
+      - mern-app
+    restart: 'no'
+
   client:
     image: doankietdev/digital-world-shop-web:1.0.0
     env_file: .env.client

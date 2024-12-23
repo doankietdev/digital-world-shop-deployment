@@ -22,9 +22,9 @@ services:
     image: certbot/certbot
     container_name: certbot
     volumes:
-      - ./certbot/www/:/var/www/certbot/:rw
-      - ./certbot/conf/:/etc/letsencrypt/:rw
-    command: certonly --webroot --webroot-path /var/www/certbot/ --dry-run -d digitals.software
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email doankietdev@gmail.com -d digitals.software --agree-tos
 
   client:
     image: doankietdev/digital-world-shop-web:1.0.0

@@ -8,7 +8,12 @@ fi
 
 # Run tmp-proxy (nginx) to serve SSL certificates
 echo "Starting tmp-proxy..."
-docker run -d --name tmp-proxy -p 80:80 -v $(pwd)/nginx.tmp.conf:/etc/nginx/nginx.conf nginx:latest
+docker run -d \
+  --name tmp-proxy \
+  -p 80:80 \
+  -v $(pwd)/nginx.tmp.conf:/etc/nginx/nginx.conf \
+  -v $(pwd)/certbot/www:/var/www/certbot \
+  nginx:latest
 
 # Check if tmp-proxy started successfully
 if [ $? -ne 0 ]; then

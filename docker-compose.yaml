@@ -17,18 +17,14 @@ services:
       - redis
     networks:
       - mern-app
-  reverse-proxy:
-    container_name: reverse-proxy
-    image: nginx:alpine
-    ports:
-      - '${HOST_PORT}:80'
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
     volumes:
-      - ./nginx.reverse.conf:/etc/nginx/nginx.conf
-    restart: 'unless-stopped'
-    depends_on:
-      - server
-    networks:
-      - mern-app
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/etc/www/certbot
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email doankietdev@gmail.com -d digitals.software --agree-tos
 
   client:
     image: doankietdev/digital-world-shop-web:1.0.0
@@ -37,21 +33,14 @@ services:
       - '80:80'
       - '443:443'
     volumes:
-      - ./nginx.forward.conf:/etc/nginx/nginx.conf
+      - ./nginx.conf:/etc/nginx/nginx.conf
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     depends_on:
-      - reverse-proxy
       - server
+      - certbot
     networks:
       - mern-app
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/etc/www/certbot
-    command: certonly --webroot -w /var/www/certbot --force-renewal --email doankietdev@gmail.com -d digitals.software --agree-tos
 
 networks:
   mern-app:

@@ -42,6 +42,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+cleanup
+
 echo "Starting Docker Compose services..."
 docker compose up -d
 

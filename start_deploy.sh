@@ -2,7 +2,10 @@
 
 cleanup() {
   echo "Cleaning up..."
+  
   docker rm -f tmp-proxy > /dev/null 2>&1
+
+  echo "Cleaned up"
 }
 
 trap cleanup EXIT
@@ -30,7 +33,7 @@ docker run -it --rm \
   --name certbot \
   -v $(pwd)/certbot/conf:/etc/letsencrypt \
   -v $(pwd)/certbot/www:/var/www/certbot \
-  certbot/certbot certonly --webroot -w /var/www/certbot --force-renewal --email doankietdev@gmail.com -d 178.128.209.229 --agree-tos
+  certbot/certbot certonly --webroot -w /var/www/certbot --force-renewal --email doankietdev@gmail.com -d digitals.software --agree-tos
 
 if [ $? -ne 0 ]; then
     echo "Error running certbot."

@@ -16,6 +16,22 @@ services:
     networks:
       - mern-app
 
+  tmp-proxy:
+    image: nginx:latest
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx.tmp.conf:/etc/nginx/nginx.conf
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email doankietdev@gmail.com -d digitals.software --agree-tos
+    depends_on:
+      - tmp-proxy
   client:
     image: doankietdev/digital-world-shop-web:1.0.0
     env_file: .env.client
@@ -28,14 +44,10 @@ services:
       - ./certbot/www:/var/www/certbot
     networks:
       - mern-app
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    command: certonly --webroot -w /var/www/certbot --force-renewal --email doankietdev@gmail.com -d digitals.software --agree-tos
+    depends_on:
+      - certbot
+      - redis
+      - server
 networks:
   mern-app:
     driver: bridge

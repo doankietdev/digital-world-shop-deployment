@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export $(grep -v '^#' .env | xargs)
+export $(grep -v '^#' .env.deploy | xargs)
 
 cleanup() {
   echo "Cleaning up..."
